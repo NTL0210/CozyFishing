@@ -23,7 +23,7 @@ import {
 let gameState = null;
 let game = null;
 
-// Global error handlers — makes debugging visible in browser console
+// Global error handlers (debugging)
 window.addEventListener('error', (e) => console.error('[Cozy Fishing] Global error:', e.error?.message || e.error));
 window.addEventListener('unhandledrejection', (e) => console.error('[Cozy Fishing] Unhandled rejection:', e.reason?.message || e.reason));
 
@@ -70,6 +70,9 @@ async function init() {
   // Mirror day/night + weather to <body> for CSS styling
   document.body.classList.add(`time-${game.timeOfDay}`);
   if (game.weather === 'rain') document.body.classList.add('weather-rain');
+
+  // Pre-populate shop sections so no "Đang tải..." placeholder is shown
+  populateShop();
 
   // Cast button
   document.getElementById('cast-btn').addEventListener('click', () => game.cast());

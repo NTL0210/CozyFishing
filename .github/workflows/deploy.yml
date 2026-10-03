@@ -5,8 +5,13 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
   pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -30,14 +35,24 @@ jobs:
           npm run build
           touch dist/.nojekyll
 
+      - name: Verify build output
+        run: |
+          echo "=== dist/ contents ==="
+          ls -la dist/
+          echo "=== dist/assets ==="
+          ls -la dist/assets/
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
           publish_branch: gh-pages
+          publish_dir: /
+          enablement: enabled
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          folder: ./dist
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          allowEmptyCommit: true
+        uses: actions/deploy-pages@v4
