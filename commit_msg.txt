@@ -1,0 +1,8 @@
+Fix: force GitHub Pages to serve from gh-pages branch
+
+The auto-generated static.yml was deploying source files to gh-pages,
+but Pages was configured to serve from main branch (source HTML with
+src="/main.js" which 404s). Now configure-pages explicitly sets
+publish_branch: gh-pages so the built dist/ output is served.
+
+Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
