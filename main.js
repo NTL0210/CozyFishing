@@ -23,11 +23,17 @@ import {
 let gameState = null;
 let game = null;
 
+// Global error handlers — makes debugging visible in browser console
+window.addEventListener('error', (e) => console.error('[Cozy Fishing] Global error:', e.error?.message || e.error));
+window.addEventListener('unhandledrejection', (e) => console.error('[Cozy Fishing] Unhandled rejection:', e.reason?.message || e.reason));
+
 // ---------------------------------------------------------------------------
 // Bootstrap
 // ---------------------------------------------------------------------------
 async function init() {
+  console.log('[Cozy Fishing] Init started');
   gameState = await initStorage();
+  console.log('[Cozy Fishing] Storage loaded:', { coins: gameState.coins, quests: gameState.quests?.length, questDate: gameState.questDate });
 
   // --- Phase 5: Offline crab-pot progress ---
   const { lootCount } = calcOfflineProgress(gameState);
@@ -38,9 +44,11 @@ async function init() {
   // Save the updated state (offline loot + possibly new quests)
   await saveGameState(gameState);
 
+  console.log('[Cozy Fishing] Rendering UI...');
   renderStatusBar();
   renderCrabPot();
   populateQuests();
+  console.log('[Cozy Fishing] UI populated — quest count:', gameState.quests?.length);
 
   // --- Initialize the fishing game ---
   const canvas = document.getElementById('game-canvas');
@@ -106,6 +114,10 @@ async function init() {
       showNotification('Nhiệm vụ mới đã được phát hành!');
     }
   }, 600);
+
+  // Pre-populate shop so players see items immediately (no "Đang tải...")
+  populateShop();
+  console.log('[Cozy Fishing] Game ready:', { timeOfDay: game.timeOfDay, weather: game.weather, zone: gameState.currentZone });
 
   // Periodic save for accurate offline timestamp
   setInterval(() => {
@@ -482,5 +494,9 @@ function showNotification(text) {
   notif._hideTimer = setTimeout(() => notif.classList.remove('show'), 3000);
 }
 
-// Start everything
-init();
+// Start everything (with error handling)
+init().catch((err) => {
+  console.error('[Cozy Fishing] Init failed:', err);
+  const el = document.getElementById('quest-list');
+  if (el) el.innerHTML = '<p style="color:red">Lỗi khởi tạo: ' + (err.message || 'unknown') + '</p>';
+});
