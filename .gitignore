@@ -14,3 +14,4 @@ Thumbs.db
 
 # CommandCode tooling (not part of the project)
 .commandcode/
+"commit_msg.txt"  
