@@ -1,0 +1,609 @@
+/* Cozy Fishing — Cozy pastel / indie aesthetic (no heavy AI gradients) */
+
+:root {
+  --color-bg:        #F7F3ED;   /* soft parchment cream */
+  --color-water:     #A8DADC;   /* muted teal-blue water */
+  --color-water-depth:#7FB7A5;  /* slightly deeper rim */
+  --color-wood:      #A88379;   /* warm wood brown */
+  --color-wood-dark: #8B6F61;   /* deeper wood for borders */
+  --color-panel:     #FFF8F0;   /* light paper panel */
+  --color-text:      #5A4A42;   /* muted dark brown text */
+  --color-accent:    #4ECDC4;   /* soft teal accent */
+  --color-gold:      #FFD369;   /* warm gold for coins */
+  --color-btn:       #FFE5B4;   /* soft peach button */
+  --color-btn-hover: #FFD5A0;
+  --color-rain:      #7A9E9F;   /* rainy overlay tint */
+  --shadow-flat:     rgba(0, 0, 0, 0.08);
+}
+
+/* Night mode overrides */
+body.time-night {
+  --color-bg:   #2C3E50;
+  --color-text: #E8E8E8;
+}
+
+body.time-night .status-bar {
+  background: #2A4A5A;
+  color: var(--color-panel);
+}
+
+body.weather-rain .water-area {
+  filter: brightness(0.88) contrast(1.1);
+}
+
+/* Reset & base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Quicksand', 'Comic Sans MS', 'Courier New', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+/* ---- Status Bar ---- */
+.status-bar {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  padding: 12px 28px;
+  background: var(--color-wood);
+  color: var(--color-panel);
+  box-shadow: 0 4px 0 var(--shadow-flat);
+  border-bottom: 2px solid var(--color-wood-dark);
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.status-item .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
+
+.status-item .value {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.status-item .value.gold {
+  color: var(--color-gold);
+}
+
+/* ---- Main game screen ---- */
+.game-screen {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: calc(100% - 56px);
+  box-sizing: border-box;
+}
+
+.water-area {
+  position: relative;
+  width: 800px;
+  height: 450px;
+  background: var(--color-water);
+  border: 6px solid var(--color-wood-dark);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 6px 0 var(--shadow-flat),
+    0 8px 0 var(--shadow-flat);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.water-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 20% 30%, var(--color-water-depth) 0%, transparent 40%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.12),
+      rgba(255,255,255,0.12) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+  pointer-events: none;
+}
+
+#game-canvas {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- Fishing UI overlay ---- */
+.fishing-ui {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  z-index: 2;
+}
+
+/* ---- Bottom UI (crab pot + quests) ---- */
+.game-bottom-ui {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 800px;
+  gap: 24px;
+}
+
+/* ---- Crab Pot ---- */
+.crab-pot-section {
+  flex: 0 0 220px;
+}
+
+.crab-pot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-panel);
+  border: 3px solid var(--color-wood-dark);
+  border-radius: 14px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 0 var(--shadow-flat);
+}
+
+.crab-pot-icon {
+  font-size: 28px;
+}
+
+.crab-pot-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.crab-pot-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.crab-pot-count {
+  font-size: 11px;
+  color: var(--color-text);
+  opacity: 0.7;
+}
+
+.btn-small {
+  padding: 6px 14px;
+  font-size: 13px;
+  background: var(--color-accent);
+  color: #fff;
+  border: 2px solid var(--color-wood-dark);
+  border-radius: 10px;
+  box-shadow: 0 3px 0 var(--shadow-flat);
+  transition: background 0.12s, transform 0.08s;
+}
+
+.btn-small:hover {
+  background: #3DA8A0;
+}
+
+.btn-small:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Daily Quests ---- */
+.quests-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.quests-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-wood-dark);
+  margin-bottom: 10px;
+}
+
+.quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quest-item {
+  background: var(--color-panel);
+  border: 2px solid var(--color-wood-dark);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 3px 0 var(--shadow-flat);
+}
+
+.quest-item.completed {
+  background: #E8F5E9;
+  border-color: #4CAF50;
+}
+
+.quest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.quest-desc {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.quest-reward {
+  font-size: 12px;
+  color: var(--color-gold);
+}
+
+.quest-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--color-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--shadow-flat);
+  margin-bottom: 4px;
+}
+
+.quest-fill {
+  height: 100%;
+  background: var(--color-accent);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.quest-progress {
+  font-size: 11px;
+  color: var(--color-text);
+  opacity: 0.7;
+  text-align: right;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  background: var(--color-btn);
+  color: var(--color-text);
+  border: 2px solid var(--color-wood-dark);
+  border-radius: 14px;
+  padding: 10px 26px;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--shadow-flat);
+  transition: background 0.12s, transform 0.08s;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: var(--color-btn-hover);
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 var(--shadow-flat);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Modals ---- */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal .panel {
+  position: relative;
+  background: var(--color-panel);
+  border: 3px solid var(--color-wood-dark);
+  border-radius: 16px;
+  box-shadow: 0 6px 0 var(--shadow-flat);
+  padding: 24px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal .panel h2 {
+  font-size: 22px;
+  color: var(--color-wood-dark);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.modal .close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  color: var(--color-text);
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.modal .close-btn:hover {
+  opacity: 1;
+}
+
+/* ---- Shop sections ---- */
+.shop-section h3 {
+  font-size: 15px;
+  color: var(--color-wood-dark);
+  margin: 16px 0 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--shadow-flat);
+}
+
+.shop-section:first-child h3 {
+  margin-top: 0;
+}
+
+/* Bait grid */
+.bait-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.bait-item {
+  background: var(--color-bg);
+  border: 2px solid var(--color-wood-dark);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 3px 0 var(--shadow-flat);
+}
+
+.bait-item.bait-current {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(78,205,196,0.4);
+}
+
+.bait-item .bait-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.bait-item .bait-price {
+  font-size: 12px;
+  color: var(--color-gold);
+  margin-bottom: 2px;
+}
+
+.bait-item .bait-mod {
+  font-size: 10px;
+  color: var(--color-text);
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.bait-item button {
+  font-size: 12px;
+  padding: 4px 12px;
+  width: 100%;
+}
+
+/* Zone grid */
+.zone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.zone-item {
+  background: var(--color-bg);
+  border: 2px solid var(--color-wood-dark);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 3px 0 var(--shadow-flat);
+}
+
+.zone-item.current {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(78,205,196,0.4);
+}
+
+.zone-icon {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.zone-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.zone-current {
+  font-size: 10px;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.zone-item button {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+/* Rod upgrade */
+.rod-upgrade {
+  margin-bottom: 4px;
+}
+
+.rod-card {
+  background: var(--color-bg);
+  border: 2px solid var(--color-wood-dark);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 3px 0 var(--shadow-flat);
+  text-align: center;
+}
+
+.rod-card.max {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+.rod-card.max .rod-name,
+.rod-card.max .max-label {
+  color: #fff;
+}
+
+.rod-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-wood-dark);
+  margin-bottom: 4px;
+}
+
+.rod-card .rod-price {
+  font-size: 13px;
+  color: var(--color-gold);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.rod-desc {
+  font-size: 12px;
+  color: var(--color-text);
+  opacity: 0.8;
+  margin-bottom: 8px;
+}
+
+.rod-card button {
+  font-size: 13px;
+  padding: 6px 16px;
+}
+
+/* ---- Fish-dex ---- */
+.fish-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.fish-card {
+  background: var(--color-bg);
+  border: 2px solid var(--color-wood-dark);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 3px 0 var(--shadow-flat);
+  text-align: center;
+}
+
+.fish-card .fish-image {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 0 var(--shadow-flat);
+}
+
+.fish-card .fish-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-wood-dark);
+  margin-bottom: 2px;
+}
+
+.fish-card .fish-rarity {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.fish-card .fish-count {
+  font-size: 11px;
+  color: var(--color-text);
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.fish-card .fish-desc {
+  font-size: 10px;
+  color: var(--color-text);
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.empty-dex {
+  text-align: center;
+  color: var(--color-text);
+  opacity: 0.5;
+  padding: 20px;
+  font-size: 14px;
+}
+
+/* ---- Toast notification ---- */
+#notification {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--color-panel);
+  border: 2px solid var(--color-wood-dark);
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  box-shadow: 0 6px 0 var(--shadow-flat);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.3s;
+  z-index: 20;
+}
+
+#notification.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

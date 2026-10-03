@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cozy Fishing — Câu cá chữa lành</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <!-- Status bar: Vàng, Mồi, Khu, Thời tiết -->
+  <header class="status-bar">
+    <div class="status-item">
+      <span class="label">Vàng</span>
+      <span class="value gold" id="coins">0</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Mồi</span>
+      <span class="value" id="bait">—</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Khu</span>
+      <span class="value" id="zone">Ao Làng</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Thời tiết</span>
+      <span class="value" id="weather">☀️ Ngày · ☀️ Nắng</span>
+    </div>
+  </header>
+
+  <!-- Main screen: water area + bottom UI -->
+  <main class="game-screen">
+    <div class="water-area">
+      <canvas id="game-canvas" width="800" height="450"></canvas>
+
+      <!-- Fishing action UI -->
+      <div class="fishing-ui">
+        <button id="cast-btn" class="btn">Câu</button>
+        <button id="shop-btn" class="btn">Cửa hàng</button>
+        <button id="dex-btn" class="btn">Fish-dex</button>
+      </div>
+    </div>
+
+    <!-- Bottom UI: crab pot + daily quests -->
+    <div class="game-bottom-ui">
+      <!-- Crab Pot (offline idle) -->
+      <div class="crab-pot-section">
+        <div class="crab-pot" id="crab-pot">
+          <span class="crab-pot-icon" title="Bẫy Cua">🦀</span>
+          <div class="crab-pot-info">
+            <span class="crab-pot-label">Bẫy Cua</span>
+            <span class="crab-pot-count" id="crab-pot-count">0 món</span>
+          </div>
+          <button class="btn btn-small" id="collect-btn">Thu thập</button>
+        </div>
+      </div>
+
+      <!-- Daily quests -->
+      <div class="quests-section">
+        <div class="quests-title">Nhiệm vụ hôm nay</div>
+        <div class="quest-list" id="quest-list">
+          <p class="empty-dex">Đang tải...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Shop Modal: rod, bait, zones -->
+  <div id="shop-modal" class="modal">
+    <div class="panel">
+      <button class="close-btn">×</button>
+      <h2>Cửa hàng</h2>
+
+      <div class="shop-section">
+        <h3>Cần câu</h3>
+        <div id="rod-upgrade" class="rod-upgrade">
+          <p>Đang tải...</p>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h3>Khu vực</h3>
+        <div id="zone-grid" class="zone-grid">
+          <p>Đang tải...</p>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h3>Mồi câu</h3>
+        <div id="bait-grid" class="bait-grid">
+          <p>Đang tải...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fish-dex Modal -->
+  <div id="dex-modal" class="modal">
+    <div class="panel">
+      <button class="close-btn">×</button>
+      <h2>Fish-dex</h2>
+      <div id="fish-grid" class="fish-grid">
+        <p class="empty-dex">Chưa có cá nào... hãy câu thử!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="notification"></div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
