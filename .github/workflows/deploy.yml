@@ -4,13 +4,9 @@ on:
   push:
     branches: [main]
 
-# Official GitHub Pages deployment uses OIDC (no token needed)
-# pages: write  -> configure & deploy Pages
-# id-token: write -> OIDC token for trusted deployment (more secure than GITHUB_TOKEN)
 permissions:
-  contents: read
+  contents: write
   pages: write
-  id-token: write
 
 jobs:
   deploy:
@@ -28,27 +24,20 @@ jobs:
         run: npm ci
 
       - name: Build
-        # GITHUB_REPOSITORY is auto-set by Actions to 'owner/repo'.
-        # Vite reads it via process.env to set the correct base path
-        # for GitHub Pages (e.g. /CozyFishing/).
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           npm run build
-          # Prevent Jekyll from mangling SPA routes
           touch dist/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
-          # Force Pages to serve from gh-pages branch (not main)
           publish_branch: gh-pages
-          publish_dir: /
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          folder: ./dist
 
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          allowEmptyCommit: true
